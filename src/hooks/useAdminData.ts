@@ -13,7 +13,6 @@ const defaultData: AdminData = {
       image: '/placeholder.png',
       description: 'Corporate site with landing and blog.',
       language: 'Next.js',
-      emails: [{ id: 'e1', email: 'info@example.com', password: '********' }]
     },
     {
       id: 'w2',
@@ -22,7 +21,6 @@ const defaultData: AdminData = {
       image: '/placeholder.png',
       description: 'Storefront and admin panel.',
       language: 'React, Node.js',
-      emails: []
     }
   ],
   mobileApps: [

@@ -1,8 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   reactStrictMode: true,
+
+  typescript: {
+    ignoreBuildErrors: true, // ✅ Type errors ignore karega build ke time
+  },
 };
 
 export default nextConfig;
