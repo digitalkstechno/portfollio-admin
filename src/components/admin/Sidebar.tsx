@@ -8,6 +8,7 @@ import {
   CreditCard,
   Users,
   LogOut,
+  Figma as FigmaIcon,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -31,6 +32,7 @@ export default function Sidebar({
     { id: "software", label: "Software", icon: Monitor },
     { id: "digitalCards", label: "Digital Cards", icon: CreditCard },
     { id: "marketingClients", label: "Marketing Clients", icon: Users },
+    { id: "figmaDesigns", label: "Figma", icon: FigmaIcon },
   ];
 
   return (

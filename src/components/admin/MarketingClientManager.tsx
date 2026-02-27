@@ -3,6 +3,7 @@ import { Pencil, Trash2, Plus, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../../lib/axios';
 import { AdminData, MarketingClient } from '../../types/admin';
+import Table, { Column } from './ui/Table';
 
 interface MarketingClientManagerProps {
   data: AdminData;
@@ -158,62 +159,27 @@ export default function MarketingClientManager({ data, onSave }: MarketingClient
       </div>
 
       {/* Table / Loading */}
-      {loading ? (
-        <div className="text-center py-12 text-gray-500">Loading marketing clients...</div>
-      ) : (
-        <div className="bg-white shadow-md rounded-xl overflow-hidden border border-gray-200">
-          <table className="w-full text-left">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-4 font-semibold text-gray-700">Title</th>
-                <th className="px-6 py-4 font-semibold text-gray-700">Description</th>
-                <th className="px-6 py-4 font-semibold text-gray-700">Link</th>
-                <th className="px-6 py-4 font-semibold text-gray-700 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="text-center py-12 text-gray-500">
-                    No marketing clients found
-                  </td>
-                </tr>
-              ) : (
-                filtered.map((client) => (
-                  <tr key={client.id} className="border-t hover:bg-gray-50 transition">
-                    <td className="px-6 py-4 font-medium">{client.title}</td>
-                    <td className="px-6 py-4 text-gray-600">{client.description}</td>
-                    <td className="px-6 py-4">
-                      <a
-                        href={client.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-purple-600 hover:text-purple-800 hover:underline text-sm break-all"
-                      >
-                        {client.link}
-                      </a>
-                    </td>
-                    <td className="px-6 py-4 text-right flex gap-4 justify-end">
-                      <button
-                        onClick={() => handleEdit(client)}
-                        className="text-indigo-600 hover:text-indigo-800 flex items-center gap-1"
-                      >
-                        <Pencil size={16} /> 
-                      </button>
-                      <button
-                        onClick={() => handleDelete(client.id)}
-                        className="text-red-600 hover:text-red-800 flex items-center gap-1"
-                      >
-                        <Trash2 size={16} /> 
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <Table<MarketingClient>
+        columns={[
+          { key: 'title', header: 'Title', accessor: (c) => c.title, className: 'font-medium' } as Column<MarketingClient>,
+          { key: 'desc', header: 'Description', accessor: (c) => <span className="text-gray-600">{c.description}</span> } as Column<MarketingClient>,
+          { key: 'link', header: 'Link', accessor: (c) => <a href={c.link} target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline break-all">{c.link}</a> } as Column<MarketingClient>,
+          { key: 'actions', header: 'Actions', className: 'text-right', render: (c) => (
+            <div className="flex gap-4 justify-end">
+              <button onClick={() => handleEdit(c)} className="text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
+                <Pencil size={16} />
+              </button>
+              <button onClick={() => handleDelete(c.id)} className="text-red-600 hover:text-red-800 flex items-center gap-1">
+                <Trash2 size={16} />
+              </button>
+            </div>
+          ) } as Column<MarketingClient>,
+        ]}
+        data={filtered}
+        isLoading={loading}
+        emptyMessage="No marketing clients found"
+        pageSize={10}
+      />
 
       {/* Add/Edit Modal */}
       {showModal && (

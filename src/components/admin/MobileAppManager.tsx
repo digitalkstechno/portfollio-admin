@@ -3,6 +3,7 @@ import { Pencil, Trash2, Plus, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../../lib/axios';
 import { AdminData, MobileApp } from '../../types/admin';
+import Table, { Column } from './ui/Table';
 
 interface MobileAppManagerProps {
   data: AdminData;
@@ -171,53 +172,27 @@ export default function MobileAppManager({ data, onSave }: MobileAppManagerProps
       </div>
 
       {/* Table / Loading */}
-      {loading ? (
-        <div className="text-center py-12 text-gray-500">Loading apps...</div>
-      ) : (
-        <div className="bg-white shadow-md rounded-xl overflow-hidden border border-gray-200">
-          <table className="w-full text-left">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-4 font-semibold text-gray-700">Title</th>
-                <th className="px-6 py-4 font-semibold text-gray-700">Language</th>
-                <th className="px-6 py-4 font-semibold text-gray-700">Software</th>
-                <th className="px-6 py-4 font-semibold text-gray-700 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="text-center py-12 text-gray-500">
-                    No apps found
-                  </td>
-                </tr>
-              ) : (
-                filtered.map((app) => (
-                  <tr key={app.id} className="border-t hover:bg-gray-50 transition">
-                    <td className="px-6 py-4 font-medium">{app.title}</td>
-                    <td className="px-6 py-4">{app.language}</td>
-                    <td className="px-6 py-4">{app.software}</td>
-                    <td className="px-6 py-4 text-right flex gap-4 justify-end">
-                      <button
-                        onClick={() => handleEdit(app)}
-                        className="text-indigo-600 hover:text-indigo-800 flex items-center gap-1"
-                      >
-                        <Pencil size={16} /> 
-                      </button>
-                      <button
-                        onClick={() => handleDelete(app.id)}
-                        className="text-red-600 hover:text-red-800 flex items-center gap-1"
-                      >
-                        <Trash2 size={16} /> 
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <Table<MobileApp>
+        columns={[
+          { key: 'title', header: 'Title', accessor: (a) => a.title, className: 'font-medium' } as Column<MobileApp>,
+          { key: 'language', header: 'Language', accessor: (a) => a.language } as Column<MobileApp>,
+          { key: 'software', header: 'Software', accessor: (a) => a.software } as Column<MobileApp>,
+          { key: 'actions', header: 'Actions', className: 'text-right', render: (a) => (
+            <div className="flex gap-4 justify-end">
+              <button onClick={() => handleEdit(a)} className="text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
+                <Pencil size={16} />
+              </button>
+              <button onClick={() => handleDelete(a.id)} className="text-red-600 hover:text-red-800 flex items-center gap-1">
+                <Trash2 size={16} />
+              </button>
+            </div>
+          ) } as Column<MobileApp>,
+        ]}
+        data={filtered}
+        isLoading={loading}
+        emptyMessage="No apps found"
+        pageSize={10}
+      />
 
       {/* Add/Edit Modal */}
       {showModal && (

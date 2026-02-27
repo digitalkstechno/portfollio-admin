@@ -8,6 +8,7 @@ import MobileAppManager from '../../components/admin/MobileAppManager';
 import SoftwareManager from '../../components/admin/SoftwareManager';
 import DigitalCardManager from '../../components/admin/DigitalCardManager';
 import MarketingClientManager from '../../components/admin/MarketingClientManager';
+import FigmaManager from '../../components/admin/FigmaManager';
 import api from '../../lib/axios';
 import toast from 'react-hot-toast';
 
@@ -27,16 +28,7 @@ export default function AdminPanel() {
     setIsLoading(false);
   }, []);
 
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (isAuthenticated) {
-      timer = setTimeout(() => {
-        setIsAuthenticated(false);
-        toast.error('Session expired');
-      }, 30 * 60 * 1000);
-    }
-    return () => clearTimeout(timer);
-  }, [isAuthenticated]);
+  // Removed auto-logout after 30 minutes
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -122,6 +114,7 @@ export default function AdminPanel() {
         {activeSection === 'software' && <SoftwareManager data={data} onSave={saveData} onNotify={(msg, type) => type === 'success' ? toast.success(msg) : toast.error(msg)} />}
         {activeSection === 'digitalCards' && <DigitalCardManager data={data} onSave={saveData} onNotify={(msg, type) => type === 'success' ? toast.success(msg) : toast.error(msg)} />}
         {activeSection === 'marketingClients' && <MarketingClientManager data={data} onSave={saveData} onNotify={(msg, type) => type === 'success' ? toast.success(msg) : toast.error(msg)} />}
+        {activeSection === 'figmaDesigns' && <FigmaManager />}
       </main>
     </div>
   );

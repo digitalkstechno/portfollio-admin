@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import api from "../../lib/axios";
 import toast from "react-hot-toast";
 import { Pencil, Trash2, Plus, X, Mail, Lock, User } from "lucide-react";
+import Table, { Column } from "./ui/Table";
 
 export interface Website {
   id: string;
@@ -31,6 +32,7 @@ export default function WebsiteManager() {
     link: "",
     description: "",
     language: "",
+    type: "ecommerce" as "ecommerce" | "informative",
   });
 
   const fetchWebsites = async () => {
@@ -77,6 +79,7 @@ export default function WebsiteManager() {
       formData.append("link", form.link.trim());
       formData.append("description", form.description.trim());
       formData.append("language", form.language.trim());
+      formData.append("type", form.type);
       if (imageFile) formData.append("image", imageFile);
       
       // Send credentials as individual fields
@@ -115,14 +118,14 @@ export default function WebsiteManager() {
   };
 
   const handleEdit = (website: Website) => {
-    setForm({ title: website.title, link: website.link, description: website.description, language: website.language });
+    setForm({ title: website.title, link: website.link, description: website.description, language: website.language, type: website.type || "ecommerce" });
     setCredentials(website.credentials || []);
     setEditingId(website.id);
     setShowModal(true);
   };
 
   const resetForm = () => {
-    setForm({ title: "", link: "", description: "", language: "" });
+    setForm({ title: "", link: "", description: "", language: "", type: "ecommerce" });
     setCredentials([]);
     setImageFile(null);
     setEditingId(null);
@@ -142,35 +145,23 @@ export default function WebsiteManager() {
 
       <input type="text" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full max-w-md border px-4 py-2.5 rounded-lg mb-6 focus:ring-2 focus:ring-gray-800 transition-all duration-300" />
 
-      {loading ? (
-        <div className="text-center py-12 text-gray-500">Loading...</div>
-      ) : (
-        <div className="bg-white shadow-md rounded-xl overflow-hidden border">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-4 text-left font-semibold text-gray-700">Title</th>
-                <th className="px-6 py-4 text-left font-semibold text-gray-700">Link</th>
-                <th className="px-6 py-4 text-left font-semibold text-gray-700">Credentials</th>
-                <th className="px-6 py-4 text-right font-semibold text-gray-700">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((website) => (
-                <tr key={website.id} className="border-t hover:bg-gray-50 transition">
-                  <td className="px-6 py-4 font-medium">{website.title}</td>
-                  <td className="px-6 py-4 text-sm text-blue-600">{website.link}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{website.credentials?.length || 0} credentials</td>
-                  <td className="px-6 py-4 text-right flex gap-4 justify-end">
-                    <button onClick={() => handleEdit(website)} className="text-indigo-600 hover:text-indigo-800"><Pencil size={16} /></button>
-                    <button onClick={() => handleDelete(website.id)} className="text-red-600 hover:text-red-800"><Trash2 size={16} /></button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <Table
+        columns={[
+          { key: "title", header: "Title", accessor: (w) => (w as Website).title, className: "font-medium" } as Column<Website>,
+          { key: "link", header: "Link", accessor: (w) => <a className='text-blue-600' href={(w as Website).link} target="_blank" rel="noreferrer">{(w as Website).link}</a> } as Column<Website>,
+          { key: "creds", header: "Credentials", accessor: (w) => ((w as Website).credentials?.length || 0) + " credentials" } as Column<Website>,
+          { key: "actions", header: "Actions", className: "text-right", render: (w) => (
+            <div className="flex gap-4 justify-end">
+              <button onClick={() => handleEdit(w as Website)} className="text-indigo-600 hover:text-indigo-800"><Pencil size={16} /></button>
+              <button onClick={() => handleDelete((w as Website).id)} className="text-red-600 hover:text-red-800"><Trash2 size={16} /></button>
+            </div>
+          ) } as Column<Website>,
+        ]}
+        data={filtered}
+        isLoading={loading}
+        emptyMessage="No websites found"
+        pageSize={10}
+      />
 
       {showModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 animate-fadeIn">
@@ -185,8 +176,12 @@ export default function WebsiteManager() {
               <input type="url" placeholder="URL *" value={form.link} onChange={e => setForm({ ...form, link: e.target.value })} className="w-full border px-4 py-2.5 rounded-lg focus:ring-2 focus:ring-gray-800 transition-all duration-300" required />
               <textarea placeholder="Description *" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} className="w-full border px-4 py-2.5 rounded-lg focus:ring-2 focus:ring-gray-800 transition-all duration-300" required />
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 <input type="text" placeholder="Language *" value={form.language} onChange={e => setForm({ ...form, language: e.target.value })} className="w-full border px-4 py-2.5 rounded-lg focus:ring-2 focus:ring-gray-800 transition-all duration-300" required />
+                <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as "ecommerce" | "informative" })} className="w-full border px-4 py-2.5 rounded-lg focus:ring-2 focus:ring-gray-800 transition-all duration-300">
+                  <option value="ecommerce">Ecommerce Website</option>
+                  <option value="informative">Informative Website</option>
+                </select>
                 <input type="file" accept="image/*" onChange={e => setImageFile(e.target.files?.[0] ?? null)} className="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-gray-100 file:text-gray-700" />
               </div>
 

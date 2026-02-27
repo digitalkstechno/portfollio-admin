@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { AdminData, Software } from '../../types/admin';
 import api from '../../lib/axios';
 import { Plus, Trash2, Pencil, X } from 'lucide-react';
+import Table, { Column } from './ui/Table';
 
 interface SoftwareManagerProps {
   data: AdminData;
@@ -122,29 +123,22 @@ export default function SoftwareManager({ data, onSave, onNotify }: SoftwareMana
         </button>
       </div>
       <input type="text" placeholder="Search software..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl mb-6 focus:ring-2 focus:ring-gray-800 transition-all duration-300" />
-      <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Credentials</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y">
-            {filtered.map(software => (
-              <tr key={software.id}>
-                <td className="px-6 py-4">{software.title}</td>
-                <td className="px-6 py-4 text-sm text-gray-500">{software.credentials?.length || 0} credentials</td>
-                <td className="px-6 py-4">
-                  <button onClick={() => handleEdit(software)} className="text-indigo-600 hover:text-indigo-800 font-medium mr-4 transition"><Pencil size={16} /></button>
-                  <button onClick={() => handleDelete(software.id)} className="text-red-600 hover:text-red-800 font-medium transition"><Trash2 size={16} /></button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <Table<Software>
+        columns={[
+          { key: "title", header: "Title", accessor: (s) => s.title } as Column<Software>,
+          { key: "creds", header: "Credentials", accessor: (s) => (s.credentials?.length || 0) + " credentials" } as Column<Software>,
+          { key: "actions", header: "Actions", render: (s) => (
+            <div className="flex gap-4">
+              <button onClick={() => handleEdit(s)} className="text-indigo-600 hover:text-indigo-800 font-medium transition"><Pencil size={16} /></button>
+              <button onClick={() => handleDelete(s.id)} className="text-red-600 hover:text-red-800 font-medium transition"><Trash2 size={16} /></button>
+            </div>
+          ) } as Column<Software>,
+        ]}
+        data={filtered}
+        isLoading={false}
+        emptyMessage="No software found"
+        pageSize={10}
+      />
 
       {showModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 animate-fadeIn">

@@ -5,6 +5,7 @@ export interface Website {
   image: string;
   description: string;
   language: string;
+  type?: "ecommerce" | "informative";
   credentials?: Array<{
     id: string;
     role: string;
