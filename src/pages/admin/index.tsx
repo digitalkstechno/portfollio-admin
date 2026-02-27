@@ -8,8 +8,8 @@ import MobileAppManager from '../../components/admin/MobileAppManager';
 import SoftwareManager from '../../components/admin/SoftwareManager';
 import DigitalCardManager from '../../components/admin/DigitalCardManager';
 import MarketingClientManager from '../../components/admin/MarketingClientManager';
-import Toast from '../../components/admin/Toast';
 import api from '../../lib/axios';
+import toast from 'react-hot-toast';
 
 export default function AdminPanel() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -17,7 +17,6 @@ export default function AdminPanel() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [activeSection, setActiveSection] = useState('dashboard');
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const { data, saveData } = useAdminData();
 
   useEffect(() => {
@@ -33,7 +32,7 @@ export default function AdminPanel() {
     if (isAuthenticated) {
       timer = setTimeout(() => {
         setIsAuthenticated(false);
-        showToast('Session expired', 'error');
+        toast.error('Session expired');
       }, 30 * 60 * 1000);
     }
     return () => clearTimeout(timer);
@@ -47,9 +46,9 @@ export default function AdminPanel() {
       setIsAuthenticated(true);
       setEmail('');
       setPassword('');
-      showToast('Login successful', 'success');
+      toast.success('Login successful');
     } catch (error: any) {
-      showToast('Invalid credentials', 'error');
+      toast.error('Invalid credentials');
     }
   };
 
@@ -57,11 +56,7 @@ export default function AdminPanel() {
     localStorage.removeItem('admin_token');
     setIsAuthenticated(false);
     setActiveSection('dashboard');
-    showToast('Logged out successfully', 'success');
-  };
-
-  const showToast = (message: string, type: 'success' | 'error') => {
-    setToast({ message, type });
+    toast.success('Logged out successfully');
   };
 
   if (isLoading) {
@@ -121,14 +116,13 @@ export default function AdminPanel() {
       <Sidebar activeSection={activeSection} onSectionChange={setActiveSection} onLogout={handleLogout} />
       <main className="flex-1 p-8 lg:ml-0 overflow-auto animate-fadeIn">
         {activeSection === 'dashboard' && <Dashboard data={data} />}
-        {activeSection === 'pin' && <PinSettings data={data} onSave={saveData} onNotify={showToast} />}
-        {activeSection === 'websites' && <WebsiteManager data={data} onSave={saveData} onNotify={showToast} />}
-        {activeSection === 'mobileApps' && <MobileAppManager data={data} onSave={saveData} onNotify={showToast} />}
-        {activeSection === 'software' && <SoftwareManager data={data} onSave={saveData} onNotify={showToast} />}
-        {activeSection === 'digitalCards' && <DigitalCardManager data={data} onSave={saveData} onNotify={showToast} />}
-        {activeSection === 'marketingClients' && <MarketingClientManager data={data} onSave={saveData} onNotify={showToast} />}
+        {activeSection === 'pin' && <PinSettings data={data} onSave={saveData} onNotify={(msg, type) => type === 'success' ? toast.success(msg) : toast.error(msg)} />}
+        {activeSection === 'websites' && <WebsiteManager data={data} onSave={saveData} onNotify={(msg, type) => type === 'success' ? toast.success(msg) : toast.error(msg)} />}
+        {activeSection === 'mobileApps' && <MobileAppManager data={data} onSave={saveData} onNotify={(msg, type) => type === 'success' ? toast.success(msg) : toast.error(msg)} />}
+        {activeSection === 'software' && <SoftwareManager data={data} onSave={saveData} onNotify={(msg, type) => type === 'success' ? toast.success(msg) : toast.error(msg)} />}
+        {activeSection === 'digitalCards' && <DigitalCardManager data={data} onSave={saveData} onNotify={(msg, type) => type === 'success' ? toast.success(msg) : toast.error(msg)} />}
+        {activeSection === 'marketingClients' && <MarketingClientManager data={data} onSave={saveData} onNotify={(msg, type) => type === 'success' ? toast.success(msg) : toast.error(msg)} />}
       </main>
-      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </div>
   );
 }
