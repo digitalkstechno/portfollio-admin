@@ -32,7 +32,7 @@ export default function WebsiteManager() {
     link: "",
     description: "",
     language: "",
-    type: "ecommerce" as "ecommerce" | "informative",
+    type: "ecommerce" as "ecommerce" | "informative" | "innovation",
   });
 
   const fetchWebsites = async () => {
@@ -178,9 +178,10 @@ export default function WebsiteManager() {
               
               <div className="grid grid-cols-3 gap-4">
                 <input type="text" placeholder="Language *" value={form.language} onChange={e => setForm({ ...form, language: e.target.value })} className="w-full border px-4 py-2.5 rounded-lg focus:ring-2 focus:ring-gray-800 transition-all duration-300" required />
-                <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as "ecommerce" | "informative" })} className="w-full border px-4 py-2.5 rounded-lg focus:ring-2 focus:ring-gray-800 transition-all duration-300">
+                <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as "ecommerce" | "informative" | "innovation" })} className="w-full border px-4 py-2.5 rounded-lg focus:ring-2 focus:ring-gray-800 transition-all duration-300">
                   <option value="ecommerce">Ecommerce Website</option>
                   <option value="informative">Informative Website</option>
+                  <option value="innovation">Innovation Website</option>
                 </select>
                 <input type="file" accept="image/*" onChange={e => setImageFile(e.target.files?.[0] ?? null)} className="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-gray-100 file:text-gray-700" />
               </div>
